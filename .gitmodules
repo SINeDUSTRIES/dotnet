@@ -1,0 +1,36 @@
+[submodule "dotEX"]
+	path = dotEX
+	url = https://github.com/SINeDUSTRIES/dotEX.git
+[submodule "dotEX.Initializable"]
+	path = dotEX.Initializable
+	url = https://github.com/SINeDUSTRIES/dotEX.Initializable.git
+[submodule "dotEX.Designs"]
+	path = dotEX.Designs
+	url = https://github.com/SINeDUSTRIES/dotEX.Designs.git
+[submodule "dotEX.Graphs"]
+	path = dotEX.Graphs
+	url = https://github.com/SINeDUSTRIES/dotEX.Graphs.git
+[submodule "dotEX.Handlers"]
+	path = dotEX.Handlers
+	url = https://github.com/SINeDUSTRIES/dotEX.Handlers.git
+[submodule "dotEX.Tally"]
+	path = dotEX.Tally
+	url = https://github.com/SINeDUSTRIES/dotEX.Tally.git
+[submodule "dotEX.Values"]
+	path = dotEX.Values
+	url = https://github.com/SINeDUSTRIES/dotEX.Values.git
+[submodule "dotEX.Common"]
+	path = dotEX.Common
+	url = https://github.com/SINeDUSTRIES/dotEX.Common.git
+[submodule "dotEX.Filters.Common"]
+	path = dotEX.Filters.Common
+	url = https://github.com/SINeDUSTRIES/dotEX.Filters.Common.git
+[submodule "dotEX.Graphs.Common"]
+	path = dotEX.Graphs.Common
+	url = https://github.com/SINeDUSTRIES/dotEX.Graphs.Common.git
+[submodule "dotEX.Tally.Common"]
+	path = dotEX.Tally.Common
+	url = https://github.com/SINeDUSTRIES/dotEX.Tally.Common.git
+[submodule "dotEX.Filters"]
+	path = dotEX.Filters
+	url = https://github.com/SINeDUSTRIES/dotEX.Filters.git
