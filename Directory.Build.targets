@@ -1,0 +1,400 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<!-- import /project/thisFile.user; this import should only be present once in build hierarchy; ie, at the "top" -->
+  <Import
+    Condition="Exists('$(MSBuildProjectDirectory)\\$(MSBuildThisFile).user')"
+    Project="$(MSBuildProjectDirectory)\\$(MSBuildThisFile).user"
+    />
+<!-- import /pathToThisFile/thisFile.user; does not import from project folder-->
+  <Import
+    Condition="'$(MSBuildThisFileDirectory)' != '$(MSBuildProjectDirectory)' and Exists('$(MSBuildThisFileFullPath).user')"
+    Project="$(MSBuildThisFileFullPath).user"
+    />
+<!-- import /../thisFile; -->
+  <Import
+    Condition="Exists($([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../')))" 
+    Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../'))" 
+    />
+    
+<!-- 
+Setup before MSBump
+$(BumpLabel) set "alpha" when version < 0
+https://github.com/dotnet/cli/issues/3778 
+-->
+  <Target Name="SetupPreBump"
+    BeforeTargets="BeforeBuild;MSBumpBeforeBuild"
+    >
+	
+	<!-- only debugs have MSBump label -->
+    
+    <!-- Beta if version < 1.0 -->
+    <PropertyGroup Condition="$(Version.StartsWith('0.')) == 'True' And '$(Configuration)' == 'Release'">
+      <Alpha>False</Alpha>
+      <Beta>True</Beta>
+      <LabelFinal>beta</LabelFinal>
+    </PropertyGroup>
+    
+    <!-- Alpha if version < 0.1 -->
+    <PropertyGroup Condition="$(Version.StartsWith('0.0.')) == 'True' And '$(Configuration)' == 'Release'">
+      <Alpha>True</Alpha>
+      <Beta>False</Beta>
+      <LabelFinal>alpha</LabelFinal>
+    </PropertyGroup>
+    
+  </Target>
+  
+<!-- 
+MSBumpBeforeBuild implicit version bumping
+ie, label reset, version bumped
+-->
+<!-- Setup after MSBump -->
+  <Target Name="SetupPostBump"
+    AfterTargets="SetupPreBump;MSBumpBeforeBuild" 
+    BeforeTargets="BeforeBuild"
+  >  
+    <!-- 
+    $(Version)-$(LabelFinal)
+    append final label AFTER reset and bump;
+    -->
+    <PropertyGroup Condition="$(LabelFinal) != ''">
+      <Version>$(Version)-$(LabelFinal)</Version>
+    </PropertyGroup>
+    
+    <!-- 
+    $(PackageVersion) = $(Version)
+    after all version stuff
+    -->
+    <PropertyGroup>
+      <PackageVersion>$(Version)</PackageVersion>
+    </PropertyGroup>
+  
+    <PropertyGroup>
+      <NuGetPackagePath>$(ProjectDir)bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg</NuGetPackagePath>
+      <CommandNuGetPack>$(CommandNuGetPack) /p:PackageVersion=$(PackageVersion)</CommandNuGetPack>
+      <CommandNuGetAdd>nuget.exe add &quot;$(NuGetPackagePath)&quot;</CommandNuGetAdd>
+      <CommandNuGetPush>dotnet nuget push &quot;$(NuGetPackagePath)&quot;</CommandNuGetPush>
+    </PropertyGroup>
+  
+    <Message Text="*****Version: $(Version); PackageVersion: $(PackageVersion); Alpha: $(Alpha); Beta: $(Beta)" Importance="high"/>
+    <!-- <Message Text="*****Command, NuGet Pack: $(CommandNuGetPack);" Importance="high"/> -->
+    <Message Text="*****ReadMe In Raw, Files: @(ReadMeInFiles -> '%(Identity)', ', ')" Importance="high"/>
+    <Message Text="*****ReadMe In Raw, Directories: @(ReadMeInDirectories -> '%(Identity)', ', ')" Importance="high"/>
+  </Target>
+    
+<!-- ReadMe Setup first -->
+  <Target Name="ReadMeSetupFirst" 
+    AfterTargets="SetupPostBump"
+    BeforeTargets="BeforeBuild"
+  >
+  </Target>
+  
+<!-- @(ReadMeIn) include @(ReadMeInFiles) -->
+  <Target Name="ReadMeSetupInFiles" 
+    AfterTargets="ReadMeSetupFirst"
+    BeforeTargets="ReadMeSetupLast"
+    
+    Inputs="@(ReadMeInFiles)"
+    Outputs="%(Identity).dummy"
+    > 
+    
+    <ItemGroup>
+      <ReadMeIn Include="%(ReadMeInFiles.Identity)" />
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- @(ReadMeIn) include @(ReadMeInDirectories) -->
+  <Target Name="ReadMeSetupInDirectories" 
+    AfterTargets="ReadMeSetupFirst;ReadMeSetupInFiles"
+    BeforeTargets="ReadMeSetupLast"
+    
+    Inputs="@(ReadMeInDirectories)"
+    Outputs="%(Identity).dummy"
+    > 
+    
+    <!-- search for files recurisvely, depth-first -->
+    <ItemGroup>
+      <ReadMeIn Include="%(ReadMeInDirectories.Identity)\**\*.*" />
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- ReadMe: set %(ProjectReference.FileNameWithoutExtension), set %(ReadMeIn.FileNameWithoutExtension) -->
+  <Target Name="ReadMeSetupFileNames"
+    AfterTargets="ReadMeSetupFirst;ReadMeSetupInFiles;ReadMeSetupInDirectories;"  
+    BeforeTargets="ReadMeSetupLast"
+    >
+      
+    <!-- set ProjectReference.FileNameWithoutExtension -->
+    <ItemGroup>
+      <ProjectReference>
+        <FileNameWithoutExtension>$([System.IO.Path]::GetFileNameWithoutExtension('%(Identity)'))</FileNameWithoutExtension>
+      </ProjectReference>
+    </ItemGroup>
+    
+    <!-- set ReadMeIn.FileNameWithoutExtension -->
+    <ItemGroup>
+      <ReadMeIn>
+        <FileNameWithoutExtension>$([System.IO.Path]::GetFileNameWithoutExtension('%(Identity)'))</FileNameWithoutExtension>
+      </ReadMeIn>
+    </ItemGroup> 
+    
+  </Target>
+  
+<!-- @(ReadMeInUnique) include filtered @(ReadMeIn) -->
+  <Target Name="ReadMeSetupLast"
+    AfterTargets="ReadMeSetupFirst"
+    BeforeTargets="BeforeBuild"
+    >
+    
+    <RemoveDuplicates  
+      Inputs="@(ReadMeIn)">
+      <Output  
+        TaskParameter="Filtered"  
+        ItemName="ReadMeInUnique"/>  
+    </RemoveDuplicates>
+    
+    <Message Text="*****ReadMe In, Final: @(ReadMeInUnique -> '%(Identity)', ', ')" Importance="high"/>  
+  </Target>
+  
+<!-- ReadMeInclude -->
+  
+  <Target Name="ReadMeIncludeFirst" AfterTargets="ReadMeSetupLast"></Target>
+  
+<!-- @(ReadMeLines): include project meta -->
+  <Target Name="ReadMeIncludeProject" 
+    AfterTargets="ReadMeIncludeFirst"
+    BeforeTargets="ReadMeIncludeLast"
+    >
+    
+    <ItemGroup> 
+      <!-- include project  -->
+      <!-- <ReadMeLines Include="&lt;strong&gt;Title&lt;/strong&gt;: $(AssemblyTitle)&lt;br&gt;"/> -->
+      <ReadMeLines Include="&lt;strong&gt;PackageId&lt;/strong&gt;: $(PackageId)&lt;br&gt;"/>
+      <ReadMeLines Include="&lt;strong&gt;Version&lt;/strong&gt;: $(Version)&lt;br&gt;"/>
+      <ReadMeLines Include="&lt;strong&gt;Description&lt;/strong&gt;: $(Description)&lt;br&gt;"/>
+
+	  <!-- spacing -->
+      <ReadMeLines Include="&lt;br&gt;"/>
+      
+      <!-- include legal -->
+      <ReadMeLines Include="&lt;strong&gt;Copyright&lt;/strong&gt;: $(Copyright)&lt;br&gt;"/>
+      <ReadMeLines Include="&lt;strong&gt;Company&lt;/strong&gt;: $(Company)&lt;br&gt;"/>
+      <ReadMeLines Include="&lt;strong&gt;Authors&lt;/strong&gt;: $(Authors)&lt;br&gt;"/>
+      <ReadMeLines Include="&lt;strong&gt;License&lt;/strong&gt;: $(PackageLicenseUrl)&lt;br&gt;"/>
+
+	  <!-- spacing -->
+      <ReadMeLines Include="&lt;br&gt;"/>
+      
+    </ItemGroup>
+  </Target>
+  
+<!-- @(ReadMeLines) include early access disclaimer -->
+  <Target Name="ReadMeIncludeEarlyAccess" 
+    AfterTargets="ReadMeIncludeProject"
+    BeforeTargets="ReadMeIncludeContactsSetup"
+    
+    Condition="$(Alpha) == 'True'"
+    >
+    
+    <ItemGroup>
+      <ReadMeLines Include="&lt;strong&gt;Disclaimer, Early Access&lt;/strong&gt;:&lt;br&gt;"/>
+      <ReadMeLines Include="- May contain bugs &lt;br&gt;" />
+      <ReadMeLines Include="- API subject to change &lt;br&gt;" />
+      <ReadMeLines Include="- Documentation may be sparse or incorrect &lt;br&gt;" />
+      <ReadMeLines Include="- Support is not guaranteed &lt;br&gt;" />
+      <ReadMeLines Include="&lt;br&gt;"/>
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- @(ReadMeLines) include contact header -->
+  <Target Name="ReadMeIncludeContactsSetup" 
+    AfterTargets="ReadMeIncludeProject"
+    BeforeTargets="ReadMeIncludeLast"
+    >
+    
+    <!-- lines: header links  -->
+    <ItemGroup>
+      <ReadMeLines Include="&lt;strong&gt;Contact&lt;/strong&gt;:&lt;br&gt;" />
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- @(ReadMeLines) include contacts -->
+  <Target Name="ReadMeIncludeContactsContent" 
+    AfterTargets="ReadMeIncludeContactsSetup"
+    BeforeTargets="ReadMeIncludeLast"
+    
+    Inputs="@(Contacts)"
+    Outputs="%(Identity).dummy"
+    >
+    
+    <!-- lines: in file header + contents  -->
+    <ItemGroup>
+      <ReadMeLines Include="- &lt;strong&gt;%(Contacts.Identity)&lt;/strong&gt;: %(Contacts.URL)&lt;br&gt;" />
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- @(ReadMeLines): include contacts footer -->
+  <Target Name="ReadMeIncludeContactsPost" 
+    AfterTargets="ReadMeIncludeContactsContent"
+    BeforeTargets="ReadMeIncludeLast"
+    >
+    
+    <!-- spacing after contacts -->
+    <ItemGroup>        
+      <ReadMeLines Include="&lt;br&gt;"/>
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- @(ReadMeLines): include dependencies -->
+  <Target Name="ReadMeIncludeDependencies" 
+    AfterTargets="ReadMeIncludeContactsPost"
+    BeforeTargets="ReadMeIncludeLast"
+    
+    Condition="'@(ProjectReference->Count())' &gt; 0 Or '@(PackageReference->Count())' &gt; 0"
+    >
+    
+    <!-- include dependencies, projects -->
+     <ItemGroup>
+       <ReadMeLines Include="&lt;strong&gt;Dependencies&lt;/strong&gt;: &lt;br&gt;"/>
+     </ItemGroup>
+    
+    <!-- PackageReference -->
+    <ItemGroup Condition="'@(PackageReference->Count())' &gt; 0">
+      <ReadMeLines Include="- %(PackageReference.Identity) v%(PackageReference.Version)&lt;br&gt;" />
+    </ItemGroup>
+    
+    <!-- ProjectReference -->
+    <ItemGroup Condition="'@(ProjectReference->Count())' &gt; 0">
+      <ReadMeLines Include="- %(ProjectReference.FileNameWithoutExtension)&lt;br&gt;" />
+    </ItemGroup>
+    
+	<!-- spacing -->
+    <ItemGroup>
+      <ReadMeLines Include="&lt;br&gt;"/> <!-- spacing -->
+    </ItemGroup>
+    
+  </Target>
+  
+<!-- @(ReadMeLines): include @(ReadMeInUnique) -->
+  <Target Name="ReadMeIncludeInFiles"
+    AfterTargets="ReadMeIncludeFirst;ReadMeIncludeProject"
+    BeforeTargets="ReadMeIncludeLast"
+    
+    Inputs="@(ReadMeInUnique)"
+    Outputs="%(FileNameWithoutExtension).dummy"
+    >
+    
+    <Message Text="*****ReadMe Content File: %(ReadMeInUnique.Identity), %(ReadMeInUnique.FileNameWithoutExtension)" Importance="low"/>
+    
+    <!-- temp: read lines -->
+    <ItemGroup>
+      <ReadMeText Include="$([System.IO.File]::ReadAllText('%(ReadMeInUnique.Identity)'))"/>
+      <!-- <ReadMeLinesSplit Include="$([System.Text.RegularExpressions.Regex]::Split('%(ReadMeLinesText.Identity)', '\r\n|\r|\n'))" /> --> <!-- whitespace not preserved -->
+    </ItemGroup>
+    
+    <!-- lines: in file header + contents  -->
+    <ItemGroup>
+      <ReadMeLines Include="&lt;strong&gt;%(ReadMeInUnique.FileNameWithoutExtension)&lt;/strong&gt;:&lt;br&gt;" />
+      <ReadMeLines Include="%(ReadMeText.Identity)" /> <!-- include text-->
+      
+      <ReadMeLines Include="&lt;br&gt;"/> <!-- spacing -->
+    </ItemGroup>
+    
+  </Target>
+  
+  <Target Name="ReadMeIncludeLast" AfterTargets="ReadMeIncludeFirst"></Target>
+
+<!-- NuGet: Update -->
+  <Target Name="NuGetUpdate" 
+    BeforeTargets="BeforeBuild" 
+    
+    Condition="'$(Configuration)'!='Debug'" 
+    >
+    <Message Text="*****NuGet Update not yet supported: https://github.com/dotnet/cli/issues/5425#issuecomment-274343316; Project: $(MSBuildProjectFile)" Importance="high"/>  
+  </Target>
+  
+<!-- AfterBuild -->
+    
+<!-- @(ReadMeLines) write to @(ReadMeOut) -->
+  <Target Name="ReadMeCreate"
+    AfterTargets="AfterBuild"
+    BeforeTargets="NuGetPack;"
+    > 
+  
+    <!-- output files write -->
+    <WriteLinesToFile
+      File="%(ReadMeOut.Identity)"
+      Lines="@(ReadMeLines)"
+      Overwrite="true"
+      Encoding="Unicode"
+    />  
+    <Message Text="*****ReadMes Created: @(ReadMeOut -> '%(Identity)', ', ')" Importance="high"/>  
+  </Target>  
+  
+<!-- Copy: from $(BaseOutputPath) to @(OutputDirectories) -->
+  <Target Name="OutputCopySetup" AfterTargets="AfterBuild;ReadMeCreate">
+    <ItemGroup>
+      <OutputFiles Include="$(OutputPath)\*.*" />
+    </ItemGroup>
+  </Target>
+  <Target Name="OutputCopyDo"
+    AfterTargets="AfterBuild;OutputCopySetup"
+    
+    Inputs="@(OutputDirectories)"
+    Outputs="%(Identity).dummy"
+    >
+    
+    <RemoveDir Directories="%(OutputDirectories.Identity)" />
+    <Copy
+      SourceFiles="@(OutputFiles)"
+      DestinationFolder="%(OutputDirectories.Identity)"
+      />
+      
+    <Message Text="*****Output Copy: $(OutputPath) to %(OutputDirectories.Identity)" Importance="high" />
+  
+  </Target>
+  
+<!-- NuGet Pack -->
+  <Target Name="NuGetPack" 
+    AfterTargets="AfterBuild;"
+    
+    Condition="'$(OutputType)' != 'Exe'"
+    >
+    <Message Text="*****NuGet Pack (MSBump): $(MSBuildProjectFile)" Importance="high" />
+    <Exec Command="$(CommandNuGetPack)"/>
+  </Target>
+  
+<!-- @(NuGetLocalFeeds) add -->
+  <Target Name="NuGetAdd" 
+    AfterTargets="NuGetPack"
+    
+    Condition="'$(OutputType)' != 'Exe' And '$(NuGetAdd)' == 'True'"
+    
+    Inputs="@(NuGetLocalFeeds)"
+    Outputs="%(Identity).dummy"
+    >
+    <Message Text="*****NuGet Add: $(MSBuildProjectFile) -> %(NuGetLocalFeeds.Identity)" Importance="high"/>
+    <Exec Command="$(CommandNuGetAdd) -Source &quot;%(NugetLocalFeeds.Identity)&quot;" />
+  </Target>
+  
+<!-- 
+@(NuGetRepos) push
+with default key
+-->
+  <Target Name="NuGetPush"
+    AfterTargets="NuGetAdd"
+    
+    Condition="'$(OutputType)'!='Exe' And '$(NuGetPush)' == 'True'"
+    
+    Inputs="@(NuGetRepos)"
+    Outputs="%(Identity).dummy"
+    >
+    <Message Text="*****NuGet Push: $(MSBuildProjectFile) -> %(NuGetRepos.Identity)" Importance="high"/>
+    <Exec Command="$(CommandNuGetPush) -s &quot;%(NuGetRepos.Identity)&quot;" />
+  </Target>
+  
+</Project>

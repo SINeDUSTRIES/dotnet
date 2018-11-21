@@ -1,0 +1,13 @@
++ EX
+  + "standard library"
++ EXCommon
+  - "non-standard library" 
+  - builds upon EX library
+  
+- type-keyed dictionary
+  - IDictionary<Type, TValue>, where, key = value.GetType()
+  
+- typeID-keyed dictionary
+  - IDictionary<string, TValue>, where, key = value.GetType().TypeIDGet()
+  
+  

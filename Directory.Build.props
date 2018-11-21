@@ -1,0 +1,160 @@
+<Project>
+<!-- defines project properties for SINeDUSTRIES libraries -->
+
+<!--
+  import /project/thisFile.user; 
+  this import should only be present once in properties hierarchy; ie, at the "top" 
+-->
+  <Import
+    Condition="Exists('$(MSBuildProjectDirectory)\\$(MSBuildThisFile).user')"
+    Project="$(MSBuildProjectDirectory)\\$(MSBuildThisFile).user"
+    />
+    
+<!--
+  import /pathToThisFile/thisFile.user; 
+  does not import from project folder
+-->
+  <Import
+    Condition="'$(MSBuildThisFileDirectory)' != '$(MSBuildProjectDirectory)' and Exists('$(MSBuildThisFileFullPath).user')"
+    Project="$(MSBuildThisFileFullPath).user"
+    />
+    
+<!-- 
+  import /../thisFile; 
+-->
+  <Import
+    Condition="Exists($([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../')))" 
+    Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../'))" 
+    />
+  
+<!-- Common -->
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo> <!-- fixes duplicate issues -->
+    <CompanyShort>SINeDUSTRIES</CompanyShort>
+    <PackageIconUrl>https://raw.githubusercontent.com/SINeDUSTRIES/Corporate/master/brand/logo.png</PackageIconUrl>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(MSBuildProjectFile.Contains('Test')) == 'False'">  <!-- libraries. build as dotnet standard if project file DOES NOT CONTAIN "test" -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DocumentationFile>bin\$(Configuration)\netstandard2.0\$(CompanyShort).$(MSBuildProjectName).xml</DocumentationFile>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(MSBuildProjectFile.Contains('Test')) == 'True'">  <!-- tests. build as dotnet core if project file contains "test" -->
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="$(MSBuildProjectFile.Contains('Test')) == 'True'"> <!-- tests. reference NUnitLite if project file contains "test" -->
+    <PackageReference Include="NUnitLite" Version="3.10.1" />
+  </ItemGroup>
+  
+<!-- Common: Legal -->
+  <PropertyGroup>
+    <Copyright>© 2018 SINeDUSTRIES, LLC</Copyright>
+    <Company>SINeDUSTRIES, LLC</Company>
+    <Authors>Walter Blacke</Authors>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://github.com/SINeDUSTRIES/Corporate/blob/master/licenses/Basic.md</PackageLicenseUrl>
+  </PropertyGroup>
+  
+<!-- Common: contacts -->
+  <ItemGroup>
+    <Contacts Include="Email"><URL>the.originalsine@gmail.com</URL></Contacts>
+    <Contacts Include="Unity Asset Store"><URL>assetstore.unity.com/publishers/36450</URL></Contacts>
+    <Contacts Include="Patreon"><URL>patreon.com/orginalsine</URL></Contacts>
+    <Contacts Include="YouTube"><URL>youtube.com/user/TheOriginalSINe</URL></Contacts>
+    <Contacts Include="Tumblr"><URL>the-originalsine.tumblr.com</URL></Contacts>
+  </ItemGroup>
+  
+<!-- Common: References: don't copy references to output assembly -->
+  <ItemDefinitionGroup Condition="$(MSBuildProjectFile.Contains('Test')) == 'False'">  <!-- exclude tests -->
+    <Reference>
+      <Private>False</Private>
+    </Reference>
+    <ProjectReference>
+      <Private>False</Private>
+    </ProjectReference>
+    <PackageReference>
+      <PrivateAssets>runtime</PrivateAssets>
+    </PackageReference>
+  </ItemDefinitionGroup>
+  
+<!-- ReadMe. properties to create readme files. these are filtered for uniqueness later -->
+  <PropertyGroup>
+	<ReadMeFilename>readme.$(MSBuildProjectName).html</ReadMeFilename>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- 
+    <ReadMeInFiles Include="example.html" /> 
+    -->
+  </ItemGroup>
+  <ItemGroup>
+    <ReadMeInDirectories Include="$(MSBuildThisFileDirectory)readme.include" /> <!-- /thisFile/readme.include/.* -->
+    <ReadMeInDirectories Include="readme.include" /> <!-- /project/readme.include/.* -->
+  </ItemGroup>
+  <ItemGroup>
+    <ReadMeOut Include="readme\\$(ReadMeFilename)"/> <!-- final path in project -->
+    <ReadMeOut Include="$(OutputPath)$(ReadMeFilename)"/> <!-- final path in output directory (ie, the "bin" folder) -->
+    <Content Include="readme\\$(ReadMeFilename)" /> <!-- NuGet packages include readme from project -->
+  </ItemGroup>
+
+<!-- MSBump. sets properties used by MSBump based on the $(BumpType) property.  -->
+  <ItemGroup>
+    <PackageReference Include="MSBump" Version="2.3.2" PrivateAssets="All" />
+  </ItemGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Debug'">
+    <BumpLabel>debug</BumpLabel>
+    <BumpLabelDigits>4</BumpLabelDigits>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Release'">
+    <BumpResetLabel>debug</BumpResetLabel>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Release' And '$(BumpType)' == 'Revision'">
+    <BumpRevision>True</BumpRevision>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Release' And '$(BumpType)' == 'Patch'">
+    <BumpResetRevision>True</BumpResetRevision>
+    <BumpPatch>True</BumpPatch>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Release' And '$(BumpType)' == 'Minor'">
+    <BumpResetRevision>True</BumpResetRevision>
+    <BumpResetPatch>True</BumpResetPatch>
+    <BumpMinor>True</BumpMinor>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Release' And '$(BumpType)' == 'Major'">
+    <BumpResetRevision>True</BumpResetRevision>
+    <BumpResetPatch>True</BumpResetPatch>
+    <BumpResetMinor>True</BumpResetMinor>
+    <BumpMajor>True</BumpMajor>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration) == 'Release' And '$(BumpType)' == 'Reset'">
+    <BumpResetLabel>debug</BumpResetLabel>
+    <BumpResetRevision>True</BumpResetRevision>
+    <BumpResetPatch>True</BumpResetPatch>
+    <BumpResetMinor>True</BumpResetMinor>
+    <BumpResetMajor>True</BumpResetMajor>
+  </PropertyGroup>
+  
+<!-- Commands -->
+  <PropertyGroup>
+    <CommandNuGetUpdate>dotnet update package</CommandNuGetUpdate>
+    <CommandNuGetPack>dotnet pack --no-build -c $(Configuration)</CommandNuGetPack>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <BuildDependsOn>
+      ReadMeCreate;
+      RestorePackages;
+      NuGetUpdate;
+      $(BuildDependsOn);
+    </BuildDependsOn>   
+  </PropertyGroup>
+
+</Project>

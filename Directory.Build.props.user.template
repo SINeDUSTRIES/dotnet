@@ -1,0 +1,44 @@
+<Project>
+
+<!-- References -->
+  <PropertyGroup>
+    <PathUnityEditorData>C:\\Program Files\\Unity\\Hub\\Editor\\2018.2.16f1\\Editor\\Data\\</PathUnityEditorData> <!-- Path to UnityEditor Data folder -->
+  </PropertyGroup>
+
+<!-- MSBump -->
+  <PropertyGroup>
+    <BumpType>None</BumpType> <!-- None | Revision | Patch | Minor | Major -->
+    <BumpResetRevision>False</BumpResetRevision> <!-- Reset to x.y.z.0? -->
+  </PropertyGroup>
+
+<!-- NuGet -->
+  <PropertyGroup>
+    <NuGetAdd>True</NuGetAdd> <!-- Add to local NuGet feeds? -->
+    <NuGetPush>False</NuGetPush> <!-- Push to remote NuGet repos? -->
+  </PropertyGroup>
+  
+  <ItemGroup>    
+    <!-- Local Feeds, Hard Drive -->
+    <NuGetLocalFeeds Include="E:\\sinedustries\\nuget\\release" Condition="$(Configuration) == 'Release'" />
+    <NuGetLocalFeeds Include="E:\\sinedustries\\nuget\\debug" Condition="$(Configuration) == 'Debug'" />
+    
+    <!-- Local Feeds, Network Drives -->
+    <!--
+    <NuGetLocalFeeds Include="S:\\nuget\\release" Condition="$(Configuration) == 'Release'" />
+    <NuGetLocalFeeds Include="S:\\nuget\\debug" Condition="$(Configuration) == 'Debug'" />
+    -->
+    
+    <!-- Remote Repositories -->
+    <NuGetRepos Include="https://api.nuget.org/v3/index.json" Condition="$(Configuration) == 'Release'" />
+  </ItemGroup>
+  
+<!-- Output -->
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <OutputDirectories Include="E:\\sinedustries\\lib\\release\\$(MSBuildProjectName)" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <OutputDirectories Include="E:\\sinedustries\\lib\\debug\\$(MSBuildProjectName)" />
+  </ItemGroup>
+  
+</Project>
