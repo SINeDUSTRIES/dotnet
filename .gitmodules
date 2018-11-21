@@ -34,3 +34,30 @@
 [submodule "dotEX.Filters"]
 	path = dotEX.Filters
 	url = https://github.com/SINeDUSTRIES/dotEX.Filters.git
+[submodule "uEX"]
+	path = uEX
+	url = https://github.com/SINeDUSTRIES/uEX.git
+[submodule "uEX.Cores"]
+	path = uEX.Cores
+	url = https://github.com/SINeDUSTRIES/uEX.Cores.git
+[submodule "uEX.Debugging"]
+	path = uEX.Debugging
+	url = https://github.com/SINeDUSTRIES/uEX.Debugging.git
+[submodule "uEX.Input.Touch"]
+	path = uEX.Input.Touch
+	url = https://github.com/SINeDUSTRIES/uEX.Input.Touch.git
+[submodule "uEX.Networking"]
+	path = uEX.Networking
+	url = https://github.com/SINeDUSTRIES/uEX.Networking.git
+[submodule "uEX.Behaviours.GameObjects"]
+	path = uEX.Behaviours.GameObjects
+	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.GameObjects.git
+[submodule "uEX.Behaviours.Grabbers"]
+	path = uEX.Behaviours.Grabbers
+	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.Grabbers.git
+[submodule "uEX.Behaviours.ScrollRects"]
+	path = uEX.Behaviours.ScrollRects
+	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.ScrollRects.git
+[submodule "uEX.Behaviours.Transforms"]
+	path = uEX.Behaviours.Transforms
+	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.Transforms.git
