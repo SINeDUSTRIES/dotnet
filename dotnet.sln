@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uEX.Input.Touch.Engine", "u
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uEX.Networking.Engine", "uEX.Networking\Engine\uEX.Networking.Engine.csproj", "{F3B9A13F-5530-493F-93E2-29B9AEE6FEA7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotEX", "dotEX\Runtime\dotEX.csproj", "{F0FB9B5E-016E-42A5-9964-96930797787F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -171,6 +173,10 @@ Global
 		{F3B9A13F-5530-493F-93E2-29B9AEE6FEA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3B9A13F-5530-493F-93E2-29B9AEE6FEA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3B9A13F-5530-493F-93E2-29B9AEE6FEA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0FB9B5E-016E-42A5-9964-96930797787F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0FB9B5E-016E-42A5-9964-96930797787F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0FB9B5E-016E-42A5-9964-96930797787F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0FB9B5E-016E-42A5-9964-96930797787F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
