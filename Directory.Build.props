@@ -57,15 +57,6 @@
     <PackageLicenseUrl>https://github.com/SINeDUSTRIES/Corporate/blob/master/licenses/Basic.md</PackageLicenseUrl>
   </PropertyGroup>
   
-<!-- Common: contacts -->
-  <ItemGroup>
-    <Contacts Include="Email"><URL>the.originalsine@gmail.com</URL></Contacts>
-    <Contacts Include="Unity Asset Store"><URL>assetstore.unity.com/publishers/36450</URL></Contacts>
-    <Contacts Include="Patreon"><URL>patreon.com/orginalsine</URL></Contacts>
-    <Contacts Include="YouTube"><URL>youtube.com/user/TheOriginalSINe</URL></Contacts>
-    <Contacts Include="Tumblr"><URL>the-originalsine.tumblr.com</URL></Contacts>
-  </ItemGroup>
-  
 <!-- Common: References: don't copy references to output assembly -->
   <ItemDefinitionGroup Condition="$(MSBuildProjectFile.Contains('Test')) == 'False'">  <!-- exclude tests -->
     <Reference>
@@ -78,25 +69,6 @@
       <PrivateAssets>runtime</PrivateAssets>
     </PackageReference>
   </ItemDefinitionGroup>
-  
-<!-- ReadMe. properties to create readme files. these are filtered for uniqueness later -->
-  <PropertyGroup>
-	<ReadMeFilename>readme.$(MSBuildProjectName).html</ReadMeFilename>
-  </PropertyGroup>
-  <ItemGroup>
-    <!-- 
-    <ReadMeInFiles Include="example.html" /> 
-    -->
-  </ItemGroup>
-  <ItemGroup>
-    <ReadMeInDirectories Include="$(MSBuildThisFileDirectory)readme.include" /> <!-- /thisFile/readme.include/.* -->
-    <ReadMeInDirectories Include="readme.include" /> <!-- /project/readme.include/.* -->
-  </ItemGroup>
-  <ItemGroup>
-    <ReadMeOut Include="readme\\$(ReadMeFilename)"/> <!-- final path in project -->
-    <ReadMeOut Include="$(OutputPath)$(ReadMeFilename)"/> <!-- final path in output directory (ie, the "bin" folder) -->
-    <Content Include="readme\\$(ReadMeFilename)" /> <!-- NuGet packages include readme from project -->
-  </ItemGroup>
 
 <!-- MSBump. sets properties used by MSBump based on the $(BumpType) property.  -->
   <ItemGroup>
@@ -150,7 +122,6 @@
   
   <PropertyGroup>
     <BuildDependsOn>
-      ReadMeCreate;
       RestorePackages;
       NuGetUpdate;
       $(BuildDependsOn);

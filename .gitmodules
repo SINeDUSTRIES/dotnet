@@ -37,18 +37,12 @@
 [submodule "uEX"]
 	path = uEX
 	url = https://github.com/SINeDUSTRIES/uEX.git
-[submodule "uEX.Cores"]
-	path = uEX.Cores
-	url = https://github.com/SINeDUSTRIES/uEX.Cores.git
 [submodule "uEX.Debugging"]
 	path = uEX.Debugging
 	url = https://github.com/SINeDUSTRIES/uEX.Debugging.git
 [submodule "uEX.Input.Touch"]
 	path = uEX.Input.Touch
 	url = https://github.com/SINeDUSTRIES/uEX.Input.Touch.git
-[submodule "uEX.Networking"]
-	path = uEX.Networking
-	url = https://github.com/SINeDUSTRIES/uEX.Networking.git
 [submodule "uEX.Behaviours.GameObjects"]
 	path = uEX.Behaviours.GameObjects
 	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.GameObjects.git
