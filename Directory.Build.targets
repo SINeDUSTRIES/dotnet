@@ -1,19 +1,16 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-<!-- import /project/thisFile.user; this import should only be present once in build hierarchy; ie, at the "top" -->
+<!-- Imports -->
+<!-- import the .user variant in this directory, if this is not the project directory (does not repeat above import) -->
   <Import
-    Condition="Exists('$(MSBuildProjectDirectory)\\$(MSBuildThisFile).user')"
-    Project="$(MSBuildProjectDirectory)\\$(MSBuildThisFile).user"
-    />
-<!-- import /pathToThisFile/thisFile.user; does not import from project folder-->
-  <Import
-    Condition="'$(MSBuildThisFileDirectory)' != '$(MSBuildProjectDirectory)' and Exists('$(MSBuildThisFileFullPath).user')"
+    Condition="Exists('$(MSBuildThisFileFullPath).user')"
     Project="$(MSBuildThisFileFullPath).user"
     />
-<!-- import /../thisFile; -->
+    
+<!-- import Directory.Build from the directory above this file -->
   <Import
     Condition="Exists($([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../')))" 
     Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../'))" 
-    />
+    />  
     
 <!-- 
 Setup before MSBump
@@ -68,7 +65,7 @@ ie, label reset, version bumped
     </PropertyGroup>
   
     <PropertyGroup>
-      <NuGetPackagePath>$(ProjectDir)bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg</NuGetPackagePath>
+      <NuGetPackagePath>$(OutputPath)\$(PackageId).$(PackageVersion).nupkg</NuGetPackagePath>
       <CommandNuGetPack>$(CommandNuGetPack) /p:PackageVersion=$(PackageVersion)</CommandNuGetPack>
       <CommandNuGetAdd>nuget.exe add &quot;$(NuGetPackagePath)&quot;</CommandNuGetAdd>
       <CommandNuGetPush>dotnet nuget push &quot;$(NuGetPackagePath)&quot;</CommandNuGetPush>
@@ -89,7 +86,7 @@ ie, label reset, version bumped
   
 <!-- AfterBuild -->
   
-<!-- Copy: from $(BaseOutputPath) to @(OutputDirectories) -->
+<!-- Copy: from $(OutputPath) to @(OutputDirectories) -->
   <Target Name="OutputCopySetup" AfterTargets="AfterBuild">
     <ItemGroup>
       <OutputFiles Include="$(OutputPath)\*.*" />

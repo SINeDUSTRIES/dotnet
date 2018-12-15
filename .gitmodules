@@ -41,17 +41,17 @@
 	path = uEX.Debugging
 	url = https://github.com/SINeDUSTRIES/uEX.Debugging.git
 [submodule "uEX.Input.Touch"]
-	path = uEX.Input.Touch
+	path = uEX.Touch
 	url = https://github.com/SINeDUSTRIES/uEX.Input.Touch.git
-[submodule "uEX.Behaviours.GameObjects"]
-	path = uEX.Behaviours.GameObjects
-	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.GameObjects.git
 [submodule "uEX.Behaviours.Grabbers"]
-	path = uEX.Behaviours.Grabbers
+	path = uEX.Grabbers
 	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.Grabbers.git
 [submodule "uEX.Behaviours.ScrollRects"]
-	path = uEX.Behaviours.ScrollRects
+	path = uEX.ScrollRects
 	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.ScrollRects.git
-[submodule "uEX.Behaviours.Transforms"]
-	path = uEX.Behaviours.Transforms
-	url = https://github.com/SINeDUSTRIES/uEX.Behaviours.Transforms.git
+[submodule "uEX.Windows"]
+	path = uEX.Windows
+	url = https://github.com/SINeDUSTRIES/uEX.Windows.git
+[submodule "uEX.AnimatorCurves"]
+	path = uEX.AnimatorCurves
+	url = https://github.com/SINeDUSTRIES/uEX.AnimatorCurves.git

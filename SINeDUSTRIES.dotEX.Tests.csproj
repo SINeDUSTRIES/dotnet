@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="**" />
+    <EmbeddedResource Remove="**" />
+    <None Remove="**" />
+    <Content Include="dotEX\Tests\src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="SINeDUSTRIES.dotEX.Runtime.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.0-preview-20181205-02" />
+  </ItemGroup>
+
+</Project>

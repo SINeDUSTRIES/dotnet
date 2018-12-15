@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>   
+    <Version>0.1.0-debug0009</Version>
+    <Description>Class library for design patterns.</Description>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="**" />
+    <EmbeddedResource Remove="**" />
+    <None Remove="**" />
+    <Content Include=".\dotEX.Designs\Runtime\src\**" />
+  </ItemGroup>
+  
+</Project>

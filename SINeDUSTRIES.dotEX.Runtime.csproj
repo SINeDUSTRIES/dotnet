@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>	
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.1.0-debug0007</Version>
+  	<RootNamespace>SINeDUSTRIES</RootNamespace>
+    <Description>Class library which extends .NET Standard Libraries.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="**" />
+    <EmbeddedResource Remove="**" />
+    <None Remove="**" />
+    <Content Include="dotEX\Runtime\src\**" />
+  </ItemGroup>
+  
+</Project>

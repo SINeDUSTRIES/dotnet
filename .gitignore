@@ -1,2 +1,6 @@
-.vs/
+**/.vs/
+**/.build/
+**/obj/
+**/bin/
+*.meta
 *.user

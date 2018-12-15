@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="**" />
+    <EmbeddedResource Remove="**" />
+    <None Remove="**" />
+    <Content Include="dotEX.Handlers\Runtime\src\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="SINeDUSTRIES.dotEX.Graphs.Runtime.csproj" />
+  </ItemGroup>
+
+</Project>
